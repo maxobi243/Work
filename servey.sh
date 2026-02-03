@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 zmodload zsh/net/tcp
-ztcp -l 5555
+ztcp -l 51324
 listen_fd=$REPLY
 echo "Listining on 5555"
 
