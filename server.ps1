@@ -8,7 +8,7 @@ Write-Host "Listening on port $port"
 
 while ($true) {
     $client = $listener.AcceptTcpClient()
-    Write-Host "Client connected from $($client.Client.RemoteEndPoint)"
+    
 
     $rs = [RunspaceFactory]::CreateRunspace()
     $rs.Open()
@@ -18,6 +18,8 @@ while ($true) {
 
     $ps.AddScript({
         param($client)
+
+        $ip = $client.Client.RemoteEndPoint.Address.ToString()
 
         $stream = $client.GetStream()
         $buffer = New-Object byte[] 5096
@@ -32,6 +34,27 @@ while ($true) {
             $text += "`n<END>`n"
             $bytes = [Text.Encoding]::ASCII.GetBytes($text)
             $stream.Write($bytes, 0, $bytes.Length)
+        }
+
+        $allowed = @("127.0.0.1", "192.168.1.121")
+
+
+        if ($ip -notin $allowed) {
+            Send "Away Away now"
+            exit
+        }
+
+        $passBuf = New-Object byte[] 1024
+
+        $sendBytes = [Text.Encoding]::ASCII.GetBytes("Password!")
+        $stream.Write($sendBytes, 0, $sendBytes.Length)
+
+        $readAmmt = $stream.Read($passBuf, 0, $passBuf.Length)
+        $sendPass = [Text.Encoding]::ASCII.GetString($passBuf, 0, $readAmmt)
+
+        if ($sendPass -ne "shellreverse") {
+            Send "Wrong Pass LEAVE"
+            exit
         }
 
 
