@@ -46,6 +46,11 @@ while ($true) {
 
         $passBuf = New-Object byte[] 1024
 
+        $stream.Write(
+            [Text.Encoding]::ASCII.GetBytes("Password:`n"),
+            0,
+            10
+        )
 
         $readAmmt = $stream.Read($passBuf, 0, $passBuf.Length)
         $sendPass = [Text.Encoding]::ASCII.GetString($passBuf, 0, $readAmmt)
